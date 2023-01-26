@@ -754,7 +754,10 @@ private:
       if (!Style.AllowShortLoopsOnASingleLine &&
           Line.First->isOneOf(tok::kw_while, tok::kw_do, tok::kw_for,
                               TT_ForEachMacro) &&
-          !Style.BraceWrapping.AfterControlStatement &&
+          (!Style.BraceWrapping.AfterControlStatement
+          || (Style.BraceWrapping.AfterControlStatement == FormatStyle::BWACS_AlwaysExceptDo
+             && Line.First->is(tok::kw_do))
+          ) &&
           !I[1]->First->is(tok::r_brace)) {
         return 0;
       }

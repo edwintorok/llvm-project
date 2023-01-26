@@ -966,6 +966,28 @@ struct FormatStyle {
     ///   }
     /// \endcode
     BWACS_MultiLine,
+    /// Always wrap braces after a control statement, except for do.
+    /// \code
+    ///
+    ///   if ( condition )
+    ///   {
+    ///       /* Do stuff. */
+    ///   }
+    ///   else
+    ///   {
+    ///       /* Other stuff. */
+    ///   }
+    ///   
+    ///   while ( condition )
+    ///   {
+    ///       /* Do stuff. */
+    ///   }
+    ///   
+    ///   do {
+    ///       /* Do stuff. */
+    ///   } while ( condition );
+    /// \endcode
+    BWACS_AlwaysExceptDo,
     /// Always wrap braces after a control statement.
     /// \code
     ///   if (foo())

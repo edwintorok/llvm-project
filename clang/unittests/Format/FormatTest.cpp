@@ -1922,6 +1922,26 @@ TEST_F(FormatTest, FormatShortBracedStatements) {
                "  b = 0;\n"
                "}",
                Style);
+
+  Style.BraceWrapping.AfterControlStatement = FormatStyle::BWACS_AlwaysExceptDo;
+  Style.SpacesInConditionalStatement = true;
+  Style.IndentWidth = 4;
+  verifyFormat("if ( condition )\n"
+               "{\n"
+               "    do_stuff();\n"
+               "}\n"
+               "else\n"
+               "{\n"
+               "    other_stuff();\n"
+               "}\n"
+               "while ( condition )\n"
+               "{\n"
+               "    do_stuff();\n"
+               "}\n"
+               "do {\n"
+               "    do_stuff();\n"
+               "} while ( condition );\n",
+               Style);
 }
 
 TEST_F(FormatTest, UnderstandsMacros) {

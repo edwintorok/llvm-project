@@ -2680,7 +2680,9 @@ void UnwrappedLineParser::parseUnbracedBody(bool CheckEOF) {
 
   if (Style.InsertBraces && !Line->InPPDirective && !Line->Tokens.empty() &&
       PreprocessorDirectives.empty() && FormatTok->isNot(tok::semi)) {
-    Tok = Style.BraceWrapping.AfterControlStatement == FormatStyle::BWACS_Never
+    Tok = (Style.BraceWrapping.AfterControlStatement == FormatStyle::BWACS_Never
+           || (Style.BraceWrapping.AfterControlStatement == FormatStyle::BWACS_AlwaysExceptDo
+               && FormatTok->is(tok::kw_do)))
               ? getLastNonComment(*Line)
               : Line->Tokens.back().Tok;
     assert(Tok);
@@ -3086,14 +3088,16 @@ void UnwrappedLineParser::parseNew() {
   } while (!eof());
 }
 
-void UnwrappedLineParser::parseLoopBody(bool KeepBraces, bool WrapRightBrace) {
+void UnwrappedLineParser::parseLoopBody(bool KeepBraces, bool WrapLeftBrace, bool WrapRightBrace) {
   keepAncestorBraces();
 
   if (isBlockBegin(*FormatTok)) {
     if (!KeepBraces)
       FormatTok->setFinalizedType(TT_ControlStatementLBrace);
     FormatToken *LeftBrace = FormatTok;
-    CompoundStatementIndenter Indenter(this, Style, Line->Level);
+    CompoundStatementIndenter Indenter(this, Line->Level,
+                                       WrapLeftBrace,
+                                       Style.BraceWrapping.IndentBraces);
     parseBlock(/*MustBeDeclaration=*/false, /*AddLevels=*/1u,
                /*MunchSemi=*/true, KeepBraces);
     if (!KeepBraces) {
@@ -3127,14 +3131,15 @@ void UnwrappedLineParser::parseForOrWhileLoop() {
     parseParens();
 
   handleAttributes();
-  parseLoopBody(KeepBraces, /*WrapRightBrace=*/true);
+  parseLoopBody(KeepBraces, Style.BraceWrapping.AfterControlStatement, /*WrapRightBrace=*/true);
 }
 
 void UnwrappedLineParser::parseDoWhile() {
   assert(FormatTok->is(tok::kw_do) && "'do' expected");
   nextToken();
 
-  parseLoopBody(/*KeepBraces=*/true, Style.BraceWrapping.BeforeWhile);
+  parseLoopBody(/*KeepBraces=*/true, Style.BraceWrapping.AfterControlStatement && Style.BraceWrapping.AfterControlStatement != FormatStyle::BWACS_AlwaysExceptDo,
+                Style.BraceWrapping.BeforeWhile);
 
   // FIXME: Add error handling.
   if (!FormatTok->is(tok::kw_while)) {

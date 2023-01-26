@@ -146,7 +146,7 @@ private:
   bool isBlockBegin(const FormatToken &Tok) const;
   FormatToken *parseIfThenElse(IfStmtKind *IfKind, bool KeepBraces = false);
   void parseTryCatch();
-  void parseLoopBody(bool KeepBraces, bool WrapRightBrace);
+  void parseLoopBody(bool KeepBraces, bool WrapLeftBrace, bool WrapRightBrace);
   void parseForOrWhileLoop();
   void parseDoWhile();
   void parseLabel(bool LeftAlignLabel = false);
